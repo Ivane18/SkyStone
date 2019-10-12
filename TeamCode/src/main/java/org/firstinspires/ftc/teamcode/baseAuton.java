@@ -124,6 +124,7 @@ public class baseAuton extends LinearOpMode
 
             move(-28,0,0);
             move(0,-40, 0);
+
             //Make sure this code does not repeat
             runOnce = false;
         }
@@ -174,7 +175,7 @@ public class baseAuton extends LinearOpMode
         }
 
         stopMotors();
-        runWithEncoder();
+        runWithEncoder(); //do we need this? I dont think so
     }
     private void movePos(int leftFrontNew, int leftBackNew, int rightFrontNew, int rightBackNew){
         leftFront.setTargetPosition(leftFrontNew);
@@ -182,7 +183,7 @@ public class baseAuton extends LinearOpMode
         rightFront.setTargetPosition(rightFrontNew);
         rightBack.setTargetPosition(rightBackNew);
 
-        runToPositionEncoder();
+        runToPositionEncoder(); //look out moving this to
         leftFront.setPower(DRIVE_SPEED);
         rightFront.setPower(DRIVE_SPEED);
         leftBack.setPower(DRIVE_SPEED);
@@ -222,6 +223,7 @@ public class baseAuton extends LinearOpMode
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //need to be in own function
 //        stoneTilt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        autonStoneExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -232,10 +234,14 @@ public class baseAuton extends LinearOpMode
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //need to be in own function
 //        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void closeAutonClaw() {
+
     }
 
 }

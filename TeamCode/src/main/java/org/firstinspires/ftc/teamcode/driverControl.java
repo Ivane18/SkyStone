@@ -57,7 +57,8 @@ public class driverControl extends LinearOpMode {
     private DcMotor autonStoneExt;
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
-
+    private Servo CapStoneServoLock;
+    private CRServo CapstoneServoLift;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -77,6 +78,8 @@ public class driverControl extends LinearOpMode {
         autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
+        CapStoneServoLock = hardwareMap.servo.get("servo4");
+        CapstoneServoLift = hardwareMap.crservo.get("servo5");
         autonStoneServo = hardwareMap.crservo.get("servo6");
 
 
@@ -100,7 +103,9 @@ public class driverControl extends LinearOpMode {
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
+        CapStoneServoLock.setPosition(0.5);
         autonStoneServo.setPower(0);
+        CapstoneServoLift.setPower(0);
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
@@ -109,13 +114,28 @@ public class driverControl extends LinearOpMode {
             double leftBackPower;
             double rightBackPower;
 
+            while(gamepad1.left_stick_button) {
+                CapstoneServoLift.setPower(0.5);
+            }
+            while(gamepad1.right_stick_button){
+                CapstoneServoLift.setPower(-0.5);
+            }
+            CapstoneServoLift.setPower(0.0);
+
             while(gamepad1.left_trigger > 0) {
-                autonStoneServo.setPower(0.5);
+                CapstoneServoLift.setPower(0.5);
             }
             while(gamepad1.right_trigger > 0){
-                autonStoneServo.setPower(-0.5);
+                CapstoneServoLift.setPower(-0.5);
             }
-            autonStoneServo.setPower(0.0);
+            CapstoneServoLift.setPower(0.0);
+
+            if(gamepad1.back){    //open
+                CapStoneServoLock.setPosition(0.0);
+            }
+            if(gamepad1.start){ //close
+                CapStoneServoLock.setPosition(1.0);
+            }
 
             // Stone Servo Controller Code
             if(gamepad1.left_bumper){    //open
