@@ -56,7 +56,7 @@ public class driverControl extends LinearOpMode {
     private DcMotor stoneTilt;
     private DcMotor autonStoneExt;
     private DcMotor autonStoneLift;
-//    private CRServo CapstoneServo;
+    private CRServo autonStoneServo;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -77,7 +77,7 @@ public class driverControl extends LinearOpMode {
         autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
-//        CapstoneServo = hardwareMap.crservo.get("servo3");
+        autonStoneServo = hardwareMap.crservo.get("servo6");
 
 
         //enables encoder method (Hurray for superfluous code!)
@@ -100,7 +100,7 @@ public class driverControl extends LinearOpMode {
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
-//        CapstoneServo.setPower(0);
+        autonStoneServo.setPower(0);
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
@@ -109,25 +109,18 @@ public class driverControl extends LinearOpMode {
             double leftBackPower;
             double rightBackPower;
 
-//            if(gamepad1.x) {
-//                CapstoneServo.setPower(0.5);
-//                sleep(50);
-//                CapstoneServo.setPower(0);
-//            }
-//            //close
-//            if(gamepad1.b){
-//                CapstoneServo.setPower(-0.5);
-//                sleep(50);
-//                CapstoneServo.setPower(0);
-//            }
+            while(gamepad1.left_trigger > 0) {
+                autonStoneServo.setPower(0.5);
+            }
+            while(gamepad1.right_trigger > 0){
+                autonStoneServo.setPower(-0.5);
+            }
+            autonStoneServo.setPower(0.0);
 
             // Stone Servo Controller Code
             if(gamepad1.left_bumper){    //open
                 StoneServoRight.setPosition(0.55);
                 StoneServoLeft.setPosition(0.45);
-
-                //Added to make sure these are closedy0
-
             }
             if(gamepad1.right_bumper){ //close
                 StoneServoRight.setPosition(1.0);
@@ -157,6 +150,13 @@ public class driverControl extends LinearOpMode {
             }
             autonStoneExt.setPower(0.0);
 
+            while(gamepad1.dpad_up){
+                autonStoneLift.setPower(0.50);
+            }
+            while(gamepad1.dpad_down){
+                autonStoneLift.setPower(-0.50);
+            }
+            autonStoneLift.setPower(0.0);
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
             float strafe_y = 0;
