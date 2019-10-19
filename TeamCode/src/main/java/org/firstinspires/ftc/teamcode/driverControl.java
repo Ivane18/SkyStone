@@ -123,12 +123,12 @@ public class driverControl extends LinearOpMode {
             CapstoneServoLift.setPower(0.0);
 
             while(gamepad1.left_trigger > 0) {
-                CapstoneServoLift.setPower(0.5);
+                autonStoneServo.setPower(0.5);
             }
             while(gamepad1.right_trigger > 0){
-                CapstoneServoLift.setPower(-0.5);
+                autonStoneServo.setPower(-0.5);
             }
-            CapstoneServoLift.setPower(0.0);
+            autonStoneServo.setPower(0.0);
 
             if(gamepad1.back){    //open
                 CapStoneServoLock.setPosition(0.0);
@@ -139,8 +139,8 @@ public class driverControl extends LinearOpMode {
 
             // Stone Servo Controller Code
             if(gamepad1.left_bumper){    //open
-                StoneServoRight.setPosition(0.55);
-                StoneServoLeft.setPosition(0.45);
+                StoneServoRight.setPosition(0.75); //was .55
+                StoneServoLeft.setPosition(0.25); //was .45
             }
             if(gamepad1.right_bumper){ //close
                 StoneServoRight.setPosition(1.0);

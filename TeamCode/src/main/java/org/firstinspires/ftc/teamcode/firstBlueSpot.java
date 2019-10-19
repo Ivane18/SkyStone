@@ -29,10 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Paint;
 import android.media.MediaPlayer;
-
-import java.util.List;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -47,9 +44,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.List;
 
-@Autonomous(name="Base Auton", group="Iterative Opmode")
-public class baseAuton extends LinearOpMode
+
+@Autonomous(name="First blue Spot", group="Iterative Opmode")
+public class firstBlueSpot extends LinearOpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -68,12 +67,15 @@ public class baseAuton extends LinearOpMode
 
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
-    private static final double COUNTS_PER_MOTOR_REV_60 = 420;    // eg: Andymark Motor Encoder
+    private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
     private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    private static final double WHEEL_DIAMETER_INCHES_Lift = 2.0;     // For figuring circumference
     private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    private static final double DRIVE_SPEED = 0.5;
+    private static final double COUNTS_PER_INCH_60 = (COUNTS_PER_MOTOR_REV_60 * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES_Lift * 3.1415);
+    private static final double DRIVE_SPEED = 0.75;
 
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
@@ -89,21 +91,21 @@ public class baseAuton extends LinearOpMode
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
-        initVuforia();
-
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
-
-        /**
-         * Activate TensorFlow Object Detection before we wait for the start command.
-         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-         **/
-        if (tfod != null) {
-            tfod.activate();
-        }
+//        initVuforia();
+//
+//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+//            initTfod();
+//        } else {
+//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+//        }
+//
+//        /**
+//         * Activate TensorFlow Object Detection before we wait for the start command.
+//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+//         **/
+//        if (tfod != null) {
+//            tfod.activate();
+//        }
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -127,6 +129,7 @@ public class baseAuton extends LinearOpMode
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
+        stoneLift.setDirection(DcMotor.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -158,8 +161,22 @@ public class baseAuton extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
-            move(-22,0,0);
-            seekSkystone(true);
+            move(30,0,0,false);
+            move(0,-20,0, false);
+            stoneTilt.setPower(-0.4);
+            sleep(1000);
+            stoneTilt.setPower(-0.1);
+            move(0,0,10, true);
+            move(-24,0,35, false);
+            stoneTilt.setPower(0.4);
+            sleep(500);
+            stoneTilt.setPower(0.0);
+//            move(0,0,30);
+            //setStoneLift(5);
+//            move(0,24, 0);
+            //setStoneLift(-5);
+            //move(0,24, 0);
+            //seekSkystone(true);
 
             //Make sure this code does not repeat
             runOnce = false;
@@ -167,7 +184,7 @@ public class baseAuton extends LinearOpMode
     }
 
     //forward/backward, side to side, turn
-    private void move(float strafeY,float strafeX, float turn){
+    private void move(float strafeY,float strafeX, float turn, boolean turnSolo){
         int leftFrontNew;
         int leftBackNew;
         int rightFrontNew;
@@ -175,12 +192,14 @@ public class baseAuton extends LinearOpMode
 
         if(strafeY!=0){
             //adding the distance to move in inches to current position
-            leftFrontNew = leftFront.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH);
-            leftBackNew = leftBack.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH);
-            rightFrontNew = rightFront.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH);
-            rightBackNew = rightBack.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH);
+            leftFrontNew = leftFront.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH) - (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
+            leftBackNew = leftBack.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH) - (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
+            rightFrontNew = rightFront.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH) + (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
+            rightBackNew = rightBack.getCurrentPosition() + (int) (strafeY * COUNTS_PER_INCH) + (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
+
 
             movePos(leftFrontNew, leftBackNew, rightFrontNew, rightBackNew);
+
         }
         if(strafeX!=0){
             leftFrontNew = leftFront.getCurrentPosition() + (int) (1.25*strafeX * COUNTS_PER_INCH);
@@ -190,7 +209,7 @@ public class baseAuton extends LinearOpMode
 
             movePos(leftFrontNew, leftBackNew, rightFrontNew, rightBackNew);
         }
-        if(turn!=0){
+        if(turn!=0 && turnSolo){
             leftFrontNew = leftFront.getCurrentPosition() - (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH) ;
             leftBackNew = leftBack.getCurrentPosition() - (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
             rightFrontNew = rightFront.getCurrentPosition() + (int) Math.round((Math.PI*12.5*turn)/180*COUNTS_PER_INCH);
@@ -225,7 +244,20 @@ public class baseAuton extends LinearOpMode
         leftBack.setPower(DRIVE_SPEED);
         rightBack.setPower(DRIVE_SPEED);
     }
-
+    private void setStoneLift(float height) {
+        int stoneLiftNew;
+        stoneLiftNew = stoneLift.getCurrentPosition() - (int) (height * COUNTS_PER_INCH_60);
+        stoneLift.setTargetPosition(stoneLiftNew);
+        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        stoneLift.setPower(0.5);
+        while(leftFront.isBusy()) {
+            telemetry.addData("StoneLiftPosition", stoneLift.getCurrentPosition());
+            telemetry.update();
+            Thread.yield();
+        }
+        stoneLift.setPower(0.0);
+        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
 
 
@@ -235,7 +267,7 @@ public class baseAuton extends LinearOpMode
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        stoneTilt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        stoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        stoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        autonStoneExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        autonStoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -244,7 +276,7 @@ public class baseAuton extends LinearOpMode
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
