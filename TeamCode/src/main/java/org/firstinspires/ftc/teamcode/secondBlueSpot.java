@@ -47,8 +47,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 
-@Autonomous(name="First Blue Spot", group="Iterative Opmode")
-public class firstBlueSpot extends LinearOpMode
+@Autonomous(name="Second Blue Spot", group="Iterative Opmode")
+public class secondBlueSpot extends LinearOpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -161,27 +161,30 @@ public class firstBlueSpot extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
-            move(30,0,0,false);
-            move(0,-20,0, false);
-            stoneTilt.setPower(-1.0);
-            sleep(250);
-            stoneTilt.setPower(-0.1);
-            move(0,0,10, true);
-            move(-29,0,40, false);
-            stoneTilt.setPower(0.4);
+            //1st stone
+            autonStoneExt.setPower(1.00);
+            sleep(4000);
+            autonStoneServo.setPower(-0.35);
             sleep(500);
-            stoneTilt.setPower(0.0);
-//            move(0,0,50, false);  //This is new trial
-
-
-            move(-6,0,0, false);
-            move(0,6,0, false);
-            move(-6,0,0, false);
-            sleep(50);
-
-            move(0,46,0, false);
-//            move(-3,0,0, false);
-            move(0,0,-30, true); //turn
+            move(-28,0,0,false);
+            autonStoneExt.setPower(0.0);
+            autonStoneServo.setPower(1.0);
+            sleep(1750);
+            move(10,0,0,false);
+            move(0,50,0,false);
+            autonStoneServo.setPower(-1.00);
+            //2nd stone
+            move(0,-61,0,false);
+            autonStoneServo.setPower(-1.00);
+            move(-10,0,0,false);
+            autonStoneServo.setPower(1.0);
+            sleep(3000);
+            move(10,0,0,false);
+            move(0,60,0,false);
+            autonStoneServo.setPower(-1.00);
+            sleep(500);
+            autonStoneServo.setPower(0.0);
+            move(0,-20,0,false);
 
 
 
