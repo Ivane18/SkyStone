@@ -171,20 +171,20 @@ public class secondRedSpot extends LinearOpMode
             autonStoneServo.setPower(1.0);
             sleep(1750);
             move(10,0,0,false);
-            move(0,50,0,false);
+            move(0,-55,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
             //2nd stone
-            move(0,-61,0,false);
+            move(0,66,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
             move(-10,0,0,false);
             autonStoneServo.setPower(1.0);
             sleep(3000);
             move(10,0,0,false);
-            move(0,60,0,false);
+            move(0,-65,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
             sleep(500);
             autonStoneServo.setPower(0.0);
-            move(0,-20,0,false);
+            move(0,20,0,false);
 
 
 
