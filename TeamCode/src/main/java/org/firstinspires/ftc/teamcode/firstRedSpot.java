@@ -227,12 +227,6 @@ public class firstRedSpot extends LinearOpMode
 
 
 
-//            move(0,0,30);
-            //setStoneLift(5);
-//            move(0,24, 0);
-            //setStoneLift(-5);
-            //move(0,24, 0);
-            //seekSkystone(true);
 
             //Make sure this code does not repeat
             runOnce = false;
