@@ -36,7 +36,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -64,7 +67,8 @@ public class secondRedSpotRecog extends LinearOpMode
     private DcMotor autonStoneExt;
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
-
+    ColorSensor colorSensor;
+    ModernRoboticsI2cRangeSensor rangeSensor;
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
     private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
@@ -81,6 +85,12 @@ public class secondRedSpotRecog extends LinearOpMode
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
+    int leftFrontTarget =0;
+    int rightFrontTarget =0;
+    int leftBackTarget =0;
+    int rightBackTarget =0;
+
+
     private static final String VUFORIA_KEY =
             "Af33ubD/////AAABmZrw69bsukgitaZjU3qd+GgiLcfzvKbbEy92WSwqo1mIjB4OHY/nm5x1tMOf2flMwKepBsnohxy1jNnfUyjkwEvmMchNupexRWSMK7vw7nGT66f1AqGpdHdJZvzvxOAWHlX1DLEOMEyOvbsCcAjvtU2BND5QFLacoYyChBsMoQTt+LI3i+aPkEgZ+YEhFJbTQUQ807WXMWfpBBTI6xTvH1gy7zXI8zLvyje7Uap5vgKD7lWOUx04Xh7AI0Lmvyvw/DfcFs3V8hUgVOTUw3OgqvUS8hSxQv8Cqm74QHQSECuOFQVNwFfJGektlnNlZyKIGCvFwIHle/89bVSkhYh7hwcSgoQtTrtdVRn5n0KNoWPW";
 
@@ -91,21 +101,21 @@ public class secondRedSpotRecog extends LinearOpMode
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
-//        initVuforia();
-//
-//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-//            initTfod();
-//        } else {
-//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-//        }
-//
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
 //        /**
 //         * Activate TensorFlow Object Detection before we wait for the start command.
 //         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
 //         **/
-//        if (tfod != null) {
-//            tfod.activate();
-//        }
+        if (tfod != null) {
+            tfod.activate();
+        }
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -121,6 +131,13 @@ public class secondRedSpotRecog extends LinearOpMode
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
         autonStoneServo = hardwareMap.crservo.get("servo6");
+        colorSensor = hardwareMap.get(ColorSensor.class, "color");
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+
+
+        colorSensor.enableLed(true);
+
+
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -161,76 +178,44 @@ public class secondRedSpotRecog extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
+
             //1st stone
             autonStoneExt.setPower(1.00);
-            sleep(4000);
+            sleep(1500);
             autonStoneServo.setPower(-0.35);
-            sleep(500);
-            move(-28,0,0,false);
-            autonStoneExt.setPower(0.0);
-            autonStoneServo.setPower(1.0);
-            sleep(1750);
-            move(10,0,0,false);
-            move(0,-40,0,false); //compensate for change of auton stone
-            autonStoneServo.setPower(-1.00);
-            //2nd stone
-            move(0,50,0,false); //compensate for change of auton stone
-            autonStoneServo.setPower(-1.00);
-            move(-12,0,0,false);
-            move(0,0,-10,true);
-            autonStoneServo.setPower(1.0);
             sleep(3000);
-            move(15,0,0,false);
-            move(0,-55,0,false); //compensate for change of auton stone
-            autonStoneServo.setPower(-1.00);
-            sleep(500);
             autonStoneServo.setPower(0.0);
-            move(0,20,0,false);
+            move(-22,0,0,false);
+            autonStoneExt.setPower(0.0);
+            seekSkystone(true);
+            move(0, -6, 0, false);
+            move(0,0,-5,true);
+            moveToStone();
+            autonStoneServo.setPower(1.0);
+            sleep(2500);
 
+            move(20,0,0,false);
 
-
-            //after blue line
-//            autonStoneExt.setPower(1.00);
-//
-//            move(0,45,0, false);
-////            move(-3,0,0, false);// This is going back on the blue line
-//
-////            sleep(500);                         //This is to the blue line.
-//
-//
-////            move(0,40,0, false);
-//
-//
-////            move(-6,0,0, false); //will hit the robot
-//            autonStoneServo.setPower(-0.35);
-//            move(0,0,200, true);
-//            autonStoneExt.setPower(0.0);
-//            autonStoneServo.setPower(1.0);
-//            move(-4,0,0, false);
-//            move(4,0,0, false);
-//            move(0,0,15, true);
-//
-//            move(0, 94, 0, false);
-//
-//            autonStoneLift.setPower(1.00);
-//            sleep(250);
+            moveToRedLine();
+            move(0,-24,0,false); //compensate for change of auton stone
+            autonStoneServo.setPower(-1.00);
+            move(0,24,0,false);
+            autonStoneServo.setPower(0.0);
+//            //2nd stone
+//            move(0,50,0,false); //compensate for change of auton stone
 //            autonStoneServo.setPower(-1.00);
-//            sleep(100);
-//            autonStoneLift.setPower(0.0);
+//            move(-12,0,0,false);
+//            move(0,0,-10,true);
+//            autonStoneServo.setPower(1.0);
+//            sleep(3000);
+//            move(15,0,0,false);
+//            move(0,-55,0,false); //compensate for change of auton stone
+//            autonStoneServo.setPower(-1.00);
+//            sleep(500);
 //            autonStoneServo.setPower(0.0);
-//            move(0, - 30, 0 ,false);
+//            move(0,20,0,false);
+//
 
-
-
-
-
-
-//            move(0,0,30);
-            //setStoneLift(5);
-//            move(0,24, 0);
-            //setStoneLift(-5);
-            //move(0,24, 0);
-            //seekSkystone(true);
 
             //Make sure this code does not repeat
             runOnce = false;
@@ -299,19 +284,23 @@ public class secondRedSpotRecog extends LinearOpMode
         leftBack.setPower(DRIVE_SPEED);
         rightBack.setPower(DRIVE_SPEED);
     }
-    private void setStoneLift(float height) {
-        int stoneLiftNew;
-        stoneLiftNew = stoneLift.getCurrentPosition() - (int) (height * COUNTS_PER_INCH_60);
-        stoneLift.setTargetPosition(stoneLiftNew);
-        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        stoneLift.setPower(0.5);
-        while(leftFront.isBusy()) {
-            telemetry.addData("StoneLiftPosition", stoneLift.getCurrentPosition());
-            telemetry.update();
-            Thread.yield();
+    private void moveToRedLine() {
+        while(colorSensor.red() < 10) {
+            leftFront.setPower(-1.00);
+            rightFront.setPower(1.00);
+            leftBack.setPower(1.00);
+            rightBack.setPower(-1.00);
         }
-        stoneLift.setPower(0.0);
-        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stopMotors();
+    }
+    private void moveToStone(){
+        while(rangeSensor.rawUltrasonic() > 6) {
+            leftFront.setPower(-0.55);
+            rightFront.setPower(-0.55);
+            leftBack.setPower(-0.55);
+            rightBack.setPower(-0.55);
+        }
+        stopMotors();
     }
 
 
@@ -367,10 +356,10 @@ public class secondRedSpotRecog extends LinearOpMode
         while (run) {
             telemetry.addLine("Moving to left");
             telemetry.update();
-            leftFront.setPower(-0.25);
-            rightFront.setPower(0.25);
-            leftBack.setPower(0.25);
-            rightBack.setPower(-0.25);
+            leftFront.setPower(0.35);
+            rightFront.setPower(-0.35);
+            leftBack.setPower(-0.35);
+            rightBack.setPower(0.35);
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -426,7 +415,7 @@ public class secondRedSpotRecog extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.5;
+        tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
