@@ -47,8 +47,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 
-@Autonomous(name="First Red Spot", group="Iterative Opmode")
-public class firstRedSpot extends LinearOpMode
+@Autonomous(name="Second Red Spot Recog", group="Iterative Opmode")
+public class secondRedSpotRecog extends LinearOpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -161,38 +161,76 @@ public class firstRedSpot extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
-            move(30,0,0,false);
-            //right not left
-            move(0,20,0, false);
-            stoneTilt.setPower(-1.0);
-            sleep(250);
-            stoneTilt.setPower(-0.1);
-            //right not left
-            move(0,0,-15, true);
-            //right turn at the end not left
-            move(-26,0,0, false);
-            move(0,0,-50, true);
-            stoneTilt.setPower(0.4);
+            //1st stone
+            autonStoneExt.setPower(1.00);
+            sleep(4000);
+            autonStoneServo.setPower(-0.35);
             sleep(500);
-            stoneTilt.setPower(0.0);
+            move(-28,0,0,false);
+            autonStoneExt.setPower(0.0);
+            autonStoneServo.setPower(1.0);
+            sleep(1750);
+            move(10,0,0,false);
+            move(0,-40,0,false); //compensate for change of auton stone
+            autonStoneServo.setPower(-1.00);
+            //2nd stone
+            move(0,50,0,false); //compensate for change of auton stone
+            autonStoneServo.setPower(-1.00);
+            move(-12,0,0,false);
+            move(0,0,-10,true);
+            autonStoneServo.setPower(1.0);
+            sleep(3000);
+            move(15,0,0,false);
+            move(0,-55,0,false); //compensate for change of auton stone
+            autonStoneServo.setPower(-1.00);
+            sleep(500);
+            autonStoneServo.setPower(0.0);
+            move(0,20,0,false);
 
 
 
-            move(-6,0,0, false);
-            //left not right
-            move(0,-6,0, false);
-            move(-6,0,0, false);
-            sleep(50);
+            //after blue line
+//            autonStoneExt.setPower(1.00);
+//
+//            move(0,45,0, false);
+////            move(-3,0,0, false);// This is going back on the blue line
+//
+////            sleep(500);                         //This is to the blue line.
+//
+//
+////            move(0,40,0, false);
+//
+//
+////            move(-6,0,0, false); //will hit the robot
+//            autonStoneServo.setPower(-0.35);
+//            move(0,0,200, true);
+//            autonStoneExt.setPower(0.0);
+//            autonStoneServo.setPower(1.0);
+//            move(-4,0,0, false);
+//            move(4,0,0, false);
+//            move(0,0,15, true);
+//
+//            move(0, 94, 0, false);
+//
+//            autonStoneLift.setPower(1.00);
+//            sleep(250);
+//            autonStoneServo.setPower(-1.00);
+//            sleep(100);
+//            autonStoneLift.setPower(0.0);
+//            autonStoneServo.setPower(0.0);
+//            move(0, - 30, 0 ,false);
 
-            //left not right
-            move(0,-46,0, false);
-
-            //left turn not right
-            move(0,0,30, true);
 
 
 
 
+
+//            move(0,0,30);
+            //setStoneLift(5);
+//            move(0,24, 0);
+            //setStoneLift(-5);
+            //move(0,24, 0);
+            //seekSkystone(true);
 
             //Make sure this code does not repeat
             runOnce = false;
@@ -338,22 +376,22 @@ public class firstRedSpot extends LinearOpMode
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-                if (updatedRecognitions != null && updatedRecognitions.size() !=0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
-                    telemetry.addLine("I see it");
-                    telemetry.update();
-                    stopMotors();
-                    run = false;
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
+                    if (updatedRecognitions != null && updatedRecognitions.size() !=0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
+                        telemetry.addLine("I see it");
+                        telemetry.update();
+                        stopMotors();
+                        run = false;
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                        }
+                        telemetry.update();
                     }
-                    telemetry.update();
-                }
             }
         }
         while(leftFront.isBusy()) {

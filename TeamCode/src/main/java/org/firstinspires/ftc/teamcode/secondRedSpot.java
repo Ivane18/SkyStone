@@ -47,7 +47,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 
-@Autonomous(name="Second Blue Spot", group="Iterative Opmode")
+@Autonomous(name="Second Red Spot", group="Iterative Opmode")
 public class secondRedSpot extends LinearOpMode
 {
     // Declare OpMode members.
@@ -171,16 +171,17 @@ public class secondRedSpot extends LinearOpMode
             autonStoneServo.setPower(1.0);
             sleep(1750);
             move(10,0,0,false);
-            move(0,-55,0,false); //compensate for change of auton stone
+            move(0,-40,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
             //2nd stone
-            move(0,66,0,false); //compensate for change of auton stone
+            move(0,50,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
-            move(-10,0,0,false);
+            move(-12,0,0,false);
+            move(0,0,-10,true);
             autonStoneServo.setPower(1.0);
             sleep(3000);
-            move(10,0,0,false);
-            move(0,-65,0,false); //compensate for change of auton stone
+            move(15,0,0,false);
+            move(0,-55,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
             sleep(500);
             autonStoneServo.setPower(0.0);
