@@ -149,45 +149,21 @@ public class firstRedSpot extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
-            move(31,0,0,false);
-            //right not left
-            move(0,20,0, false);
-            stoneTilt.setPower(-1.0);
-            sleep(250);
-            stoneTilt.setPower(-0.1);
-            //right not left
-            move(0,0,-15, true);
-            //right turn at the end not left
-            move(-26,0,0, false);
-            move(0,0,-50, true);
-            stoneTilt.setPower(0.4);
-            sleep(500);
-            stoneTilt.setPower(0.0);
-
-
-
-            move(-6,0,0, false);
-            //left not right
-            move(0,-6,0, false);
-            move(-6,0,0, false);
-            sleep(50);
-
-            //left not right
-            move(0,-46,0, false);
-
-            //left turn not right
-            move(0,0,30, true);
-
-
-
-
+            move(-30, 0, 0, false);
+            move(0, -16, 0, false);
+            autonPlatformServo.setPower(1.0);
+            sleep(3000);
+            move(-30, 0, 0, false);
+            autonPlatformServo.setPower(-1.0);
+            sleep(1000);
+            autonPlatformServo.setPower(0.0);
+            move(0, 48, 0, false);
 
             //Make sure this code does not repeat
             runOnce = false;
         }
     }
 
-    //forward/backward, side to side, turn
     private void move(float strafeY,float strafeX, float turn, boolean turnSolo){
         int leftFrontNew;
         int leftBackNew;

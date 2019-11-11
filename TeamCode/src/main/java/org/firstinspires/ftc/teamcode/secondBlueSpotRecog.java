@@ -193,7 +193,7 @@ public class secondBlueSpotRecog extends LinearOpMode
             move(-20,0,0,false);
             autonStoneExt.setPower(0.0);
             seekSkystone(true);
-            move(0, -4, 0, false);
+//            move(0, -4, 0, false);
 //            move(0,0,5,true);
             moveToStone();
             autonStoneServo.setPower(1.0);
@@ -290,11 +290,11 @@ public class secondBlueSpotRecog extends LinearOpMode
         rightBack.setPower(DRIVE_SPEED);
     }
     private void moveToBlueLine() {
-        while(colorSensor.blue() < 15) {
-            leftFront.setPower(1.00);
-            rightFront.setPower(-1.00);
-            leftBack.setPower(-1.00);
-            rightBack.setPower(1.00);
+        while (colorSensor.blue() < 10) {
+            leftFront.setPower(0.75);
+            rightFront.setPower(-0.75);
+            leftBack.setPower(-0.75);
+            rightBack.setPower(0.75);
         }
         stopMotors();
     }

@@ -147,29 +147,20 @@ public class firstBlueSpot extends LinearOpMode
         telemetry.update();
 
         while (opModeIsActive() && runOnce) {
-            move(31,0,0,false);
-            move(0,-20,0, false);
-            stoneTilt.setPower(-1.0);
-            sleep(250);
-            stoneTilt.setPower(-0.1);
-            move(0,0,10, true);
-            move(-29,0,40, false);
-            stoneTilt.setPower(0.4);
-            sleep(500);
-            stoneTilt.setPower(0.0);
-            move(-6,0,0, false);
-            move(0,6,0, false);
-            move(-6,0,0, false);
-            sleep(50);
-            move(0,46,0, false);
-            move(0,0,-30, true); //turn
+            move(-30, 0, 0, false);
+            move(0, 16, 0, false);
+            autonPlatformServo.setPower(1.0);
+            sleep(3000);
+            move(30, 0, 0, false);
+            autonPlatformServo.setPower(-1.0);
+            sleep(1000);
+            autonPlatformServo.setPower(0.0);
+            move(0, -48, 0, false);
 
-            //Make sure this code does not repeat
             runOnce = false;
         }
     }
 
-    //forward/backward, side to side, turn
     private void move(float strafeY,float strafeX, float turn, boolean turnSolo){
         int leftFrontNew;
         int leftBackNew;

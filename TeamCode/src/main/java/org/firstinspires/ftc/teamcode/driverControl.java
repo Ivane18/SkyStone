@@ -116,6 +116,14 @@ public class driverControl extends LinearOpMode {
             }
             autonStoneServo.setPower(0.0);
 
+            while (gamepad1.dpad_left) {
+                autonPlatformServo.setPower(0.5);
+            }
+            while (gamepad1.dpad_right) {
+                autonPlatformServo.setPower(-0.5);
+            }
+            autonPlatformServo.setPower(0.0);
+
             if(gamepad2.a){    //lock
                 CapStoneServoLock.setPosition(0.0);
             }
