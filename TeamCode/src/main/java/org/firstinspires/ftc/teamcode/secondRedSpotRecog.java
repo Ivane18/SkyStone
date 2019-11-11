@@ -67,6 +67,7 @@ public class secondRedSpotRecog extends LinearOpMode
     private DcMotor autonStoneExt;
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
+    private Servo CapStoneServoLock;
     ColorSensor colorSensor;
     ModernRoboticsI2cRangeSensor rangeSensor;
 
@@ -130,9 +131,10 @@ public class secondRedSpotRecog extends LinearOpMode
         autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
+        CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
         colorSensor = hardwareMap.get(ColorSensor.class, "color");
-        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeRed");
 
 
         colorSensor.enableLed(true);
@@ -161,7 +163,7 @@ public class secondRedSpotRecog extends LinearOpMode
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
         autonStoneServo.setPower(0);
-
+        CapStoneServoLock.setPosition(0.0);
 
 
 
@@ -176,10 +178,10 @@ public class secondRedSpotRecog extends LinearOpMode
         telemetry.update();
 
         while (opModeIsActive() && runOnce) {
-            //Instructions for the robot
 
 
-            //1st stone
+
+
             autonStoneExt.setPower(1.00);
             sleep(1500);
             autonStoneServo.setPower(-0.35);
@@ -188,34 +190,33 @@ public class secondRedSpotRecog extends LinearOpMode
             move(-22,0,0,false);
             autonStoneExt.setPower(0.0);
             seekSkystone(true);
-            move(0, -6, 0, false);
             move(0,0,-5,true);
             moveToStone();
             autonStoneServo.setPower(1.0);
-            sleep(2500);
-
+            autonStoneLift.setPower(-0.5);
+            sleep(250);
+            autonStoneLift.setPower(0.0);
+            sleep(2150);
             move(20,0,0,false);
-
+            move(0,0,-15, true);
             moveToRedLine();
-            move(0,-24,0,false); //compensate for change of auton stone
+            move(0,-28,0,false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
-            move(0,24,0,false);
+            move(0,28,0,false);
             autonStoneServo.setPower(0.0);
-//            //2nd stone
-//            move(0,50,0,false); //compensate for change of auton stone
-//            autonStoneServo.setPower(-1.00);
-//            move(-12,0,0,false);
-//            move(0,0,-10,true);
-//            autonStoneServo.setPower(1.0);
-//            sleep(3000);
-//            move(15,0,0,false);
-//            move(0,-55,0,false); //compensate for change of auton stone
-//            autonStoneServo.setPower(-1.00);
-//            sleep(500);
-//            autonStoneServo.setPower(0.0);
-//            move(0,20,0,false);
-//
 
+
+            autonStoneLift.setPower(0.5);
+            autonStoneExt.setPower(-1.00);
+            sleep(300);
+            autonStoneLift.setPower(0.0);
+            sleep(1250);
+            autonStoneServo.setPower(0.35);
+            sleep(3000);
+            autonStoneServo.setPower(0.0);
+            autonStoneLift.setPower(-0.5);
+            sleep(250);
+            autonStoneLift.setPower(0.0);
 
             //Make sure this code does not repeat
             runOnce = false;
@@ -294,12 +295,12 @@ public class secondRedSpotRecog extends LinearOpMode
         stopMotors();
     }
     private void moveToStone(){
-        while(rangeSensor.rawUltrasonic() > 6) {
-            leftFront.setPower(-0.55);
-            rightFront.setPower(-0.55);
-            leftBack.setPower(-0.55);
-            rightBack.setPower(-0.55);
-        }
+            while(rangeSensor.rawUltrasonic() > 7) {
+                leftFront.setPower(-0.55);
+                rightFront.setPower(-0.55);
+                leftBack.setPower(-0.55);
+                rightBack.setPower(-0.55);
+            }
         stopMotors();
     }
 
@@ -310,19 +311,12 @@ public class secondRedSpotRecog extends LinearOpMode
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        stoneTilt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        stoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
     private void stopMotors(){
         leftFront.setPower(0);
@@ -335,22 +329,12 @@ public class secondRedSpotRecog extends LinearOpMode
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //need to be in own function
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void runWithEncoder() {
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //need to be in own function
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void seekSkystone(boolean run) {
         while (run) {

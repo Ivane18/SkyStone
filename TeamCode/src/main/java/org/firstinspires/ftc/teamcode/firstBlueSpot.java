@@ -64,6 +64,7 @@ public class firstBlueSpot extends LinearOpMode
     private DcMotor autonStoneExt;
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
+    private Servo CapStoneServoLock;
 
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
@@ -120,6 +121,7 @@ public class firstBlueSpot extends LinearOpMode
         autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
+        CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
 
         //initialize components
@@ -144,7 +146,7 @@ public class firstBlueSpot extends LinearOpMode
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
         autonStoneServo.setPower(0);
-
+        CapStoneServoLock.setPosition(0.0);
 
 
 
@@ -161,7 +163,7 @@ public class firstBlueSpot extends LinearOpMode
         while (opModeIsActive() && runOnce) {
             //Instructions for the robot
 
-            move(30,0,0,false);
+            move(31,0,0,false);
             move(0,-20,0, false);
             stoneTilt.setPower(-1.0);
             sleep(250);

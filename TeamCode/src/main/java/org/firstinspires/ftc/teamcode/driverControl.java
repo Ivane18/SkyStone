@@ -58,7 +58,8 @@ public class driverControl extends LinearOpMode {
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
-    private CRServo CapstoneServoLift;
+    private CRServo autonPlatformServo;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -79,11 +80,9 @@ public class driverControl extends LinearOpMode {
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
-        CapstoneServoLift = hardwareMap.crservo.get("servo5");
         autonStoneServo = hardwareMap.crservo.get("servo6");
+        autonPlatformServo = hardwareMap.crservo.get("servo5");
 
-
-        //enables encoder method (Hurray for superfluous code!)
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftFront.setDirection(DcMotor.Direction.FORWARD);
@@ -103,9 +102,9 @@ public class driverControl extends LinearOpMode {
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
-        CapStoneServoLock.setPosition(0.5);
+        CapStoneServoLock.setPosition(0.0);
         autonStoneServo.setPower(0);
-        CapstoneServoLift.setPower(0);
+        autonPlatformServo.setPower(0.0);
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
@@ -114,26 +113,18 @@ public class driverControl extends LinearOpMode {
             double leftBackPower;
             double rightBackPower;
 
-            while(gamepad1.left_stick_button) {
-                CapstoneServoLift.setPower(0.5);
-            }
-            while(gamepad1.right_stick_button){
-                CapstoneServoLift.setPower(-0.5);
-            }
-            CapstoneServoLift.setPower(0.0);
-
-            while(gamepad1.left_trigger > 0) {
+            while(gamepad2.left_trigger > 0) {
                 autonStoneServo.setPower(0.5);
             }
-            while(gamepad1.right_trigger > 0){
+            while(gamepad2.right_trigger > 0){
                 autonStoneServo.setPower(-0.5);
             }
             autonStoneServo.setPower(0.0);
 
-            if(gamepad1.back){    //open
+            if(gamepad2.a){    //lock
                 CapStoneServoLock.setPosition(0.0);
             }
-            if(gamepad1.start){ //close
+            if(gamepad2.b){ //drop
                 CapStoneServoLock.setPosition(1.0);
             }
 
@@ -162,18 +153,18 @@ public class driverControl extends LinearOpMode {
             }
             stoneTilt.setPower(-0.1);
 
-            while(gamepad1.dpad_left){
+            while(gamepad2.dpad_left){
                 autonStoneExt.setPower(0.50);
             }
-            while(gamepad1.dpad_right){
+            while(gamepad2.dpad_right){
                 autonStoneExt.setPower(-0.50);
             }
             autonStoneExt.setPower(0.0);
 
-            while(gamepad1.dpad_up){
+            while(gamepad2.dpad_up){
                 autonStoneLift.setPower(0.50);
             }
-            while(gamepad1.dpad_down){
+            while(gamepad2.dpad_down){
                 autonStoneLift.setPower(-0.50);
             }
             autonStoneLift.setPower(0.0);
@@ -183,12 +174,8 @@ public class driverControl extends LinearOpMode {
             float strafe_x = 0;
             float turn = 0;
 
-//            if (!switchMode) {
-//                strafe_y = -gamepad1.left_stick_y;
-//                strafe_x = gamepad1.left_stick_x;
-//                turn = gamepad1.right_stick_x;
-//            }
-//            else{
+
+//            other way{
 //                strafe_y = gamepad1.left_stick_y;
 //                strafe_x = -gamepad1.left_stick_x;
 //                turn = gamepad1.right_stick_x;
@@ -201,9 +188,6 @@ public class driverControl extends LinearOpMode {
             rightFrontPower = Range.clip(strafe_y - strafe_x - turn, -1.0, 1.0);
             leftBackPower = Range.clip(strafe_y - strafe_x + turn, -1.0, 1.0);
             rightBackPower = Range.clip(strafe_y + strafe_x - turn, -1.0, 1.0);
-
-
-
 
             // Send calculated power to wheels
             leftFront.setPower(leftFrontPower);
