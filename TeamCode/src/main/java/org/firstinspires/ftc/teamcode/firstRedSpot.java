@@ -65,7 +65,7 @@ public class firstRedSpot extends LinearOpMode
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
-
+    private CRServo autonPlatformServo;
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
     private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
@@ -90,23 +90,7 @@ public class firstRedSpot extends LinearOpMode
     private TFObjectDetector tfod;
     @Override
     public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-//        initVuforia();
-//
-//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-//            initTfod();
-//        } else {
-//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-//        }
-//
-//        /**
-//         * Activate TensorFlow Object Detection before we wait for the start command.
-//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-//         **/
-//        if (tfod != null) {
-//            tfod.activate();
-//        }
+
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -123,6 +107,7 @@ public class firstRedSpot extends LinearOpMode
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
+        autonPlatformServo = hardwareMap.crservo.get("servo5");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -147,6 +132,7 @@ public class firstRedSpot extends LinearOpMode
         StoneServoLeft.setPosition(0.3);
         autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
+        autonPlatformServo.setPower(0.0);
 
 
 
@@ -263,41 +249,17 @@ public class firstRedSpot extends LinearOpMode
         leftBack.setPower(DRIVE_SPEED);
         rightBack.setPower(DRIVE_SPEED);
     }
-    private void setStoneLift(float height) {
-        int stoneLiftNew;
-        stoneLiftNew = stoneLift.getCurrentPosition() - (int) (height * COUNTS_PER_INCH_60);
-        stoneLift.setTargetPosition(stoneLiftNew);
-        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        stoneLift.setPower(0.5);
-        while(leftFront.isBusy()) {
-            telemetry.addData("StoneLiftPosition", stoneLift.getCurrentPosition());
-            telemetry.update();
-            Thread.yield();
-        }
-        stoneLift.setPower(0.0);
-        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-
 
     private void enableEncoders(){
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        stoneTilt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        stoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     private void stopMotors(){
         leftFront.setPower(0);
@@ -310,90 +272,12 @@ public class firstRedSpot extends LinearOpMode
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //need to be in own function
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        stoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void runWithEncoder() {
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //need to be in own function
-//        stoneTilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        stoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
-    public void seekSkystone(boolean run) {
-        while (run) {
-            telemetry.addLine("Moving to left");
-            telemetry.update();
-            leftFront.setPower(-0.25);
-            rightFront.setPower(0.25);
-            leftBack.setPower(0.25);
-            rightBack.setPower(-0.25);
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-
-                if (updatedRecognitions != null && updatedRecognitions.size() !=0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
-                    telemetry.addLine("I see it");
-                    telemetry.update();
-                    stopMotors();
-                    run = false;
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                    }
-                    telemetry.update();
-                }
-            }
-        }
-        while(leftFront.isBusy()) {
-            telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
-            telemetry.addData("leftBackPosition", leftBack.getCurrentPosition());
-            telemetry.addData("RightFontPosition", rightFront.getCurrentPosition());
-            telemetry.addData("rightBackPosition", rightBack.getCurrentPosition());
-            telemetry.update();
-            Thread.yield();
-        }
-        stopMotors();
-    }
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
-
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.5;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
-    }
-
-
 }

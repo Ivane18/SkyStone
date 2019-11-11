@@ -65,10 +65,6 @@ public class driverControl extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
@@ -83,8 +79,6 @@ public class driverControl extends LinearOpMode {
         autonStoneServo = hardwareMap.crservo.get("servo6");
         autonPlatformServo = hardwareMap.crservo.get("servo5");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
@@ -99,14 +93,15 @@ public class driverControl extends LinearOpMode {
         autonStoneExt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autonStoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
         CapStoneServoLock.setPosition(0.0);
         autonStoneServo.setPower(0);
         autonPlatformServo.setPower(0.0);
+
         waitForStart();
         runtime.reset();
+
         while (opModeIsActive()) {
             double leftFrontPower;
             double rightFrontPower;

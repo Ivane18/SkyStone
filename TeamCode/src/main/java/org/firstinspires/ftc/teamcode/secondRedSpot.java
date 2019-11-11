@@ -65,7 +65,7 @@ public class secondRedSpot extends LinearOpMode
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
-
+    private CRServo autonPlatformServo;
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
     private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
@@ -90,23 +90,6 @@ public class secondRedSpot extends LinearOpMode
     private TFObjectDetector tfod;
     @Override
     public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-//        initVuforia();
-//
-//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-//            initTfod();
-//        } else {
-//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-//        }
-//
-//        /**
-//         * Activate TensorFlow Object Detection before we wait for the start command.
-//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-//         **/
-//        if (tfod != null) {
-//            tfod.activate();
-//        }
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -123,6 +106,8 @@ public class secondRedSpot extends LinearOpMode
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
+        autonPlatformServo = hardwareMap.crservo.get("servo5");
+
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -147,6 +132,7 @@ public class secondRedSpot extends LinearOpMode
         StoneServoLeft.setPosition(0.3);
         autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
+        autonPlatformServo.setPower(0.0);
 
 
 

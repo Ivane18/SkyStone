@@ -67,6 +67,7 @@ public class secondBlueSpotRecog extends LinearOpMode
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
+    private CRServo autonPlatformServo;
     ColorSensor colorSensor;
     ModernRoboticsI2cRangeSensor rangeSensor;
 
@@ -132,6 +133,7 @@ public class secondBlueSpotRecog extends LinearOpMode
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
+        autonPlatformServo = hardwareMap.crservo.get("servo5");
         colorSensor = hardwareMap.get(ColorSensor.class, "color");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeBlue");
 
@@ -163,6 +165,7 @@ public class secondBlueSpotRecog extends LinearOpMode
         StoneServoLeft.setPosition(0.3);
         autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
+        autonPlatformServo.setPower(0.0);
 
 
 
