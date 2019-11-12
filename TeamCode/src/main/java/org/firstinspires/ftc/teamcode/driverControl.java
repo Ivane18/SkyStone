@@ -58,6 +58,7 @@ public class driverControl extends LinearOpMode {
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
+    private Servo autonStoneGrab;
     private CRServo autonPlatformServo;
 
     /*
@@ -78,6 +79,7 @@ public class driverControl extends LinearOpMode {
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
         autonPlatformServo = hardwareMap.crservo.get("servo5");
+        autonStoneGrab = hardwareMap.servo.get("servo7");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
@@ -98,7 +100,7 @@ public class driverControl extends LinearOpMode {
         CapStoneServoLock.setPosition(0.0);
         autonStoneServo.setPower(0);
         autonPlatformServo.setPower(0.0);
-
+        autonStoneGrab.setPosition(0.0);
         waitForStart();
         runtime.reset();
 

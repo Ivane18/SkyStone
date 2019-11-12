@@ -65,6 +65,7 @@ public class secondRedSpot extends LinearOpMode
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
+    private Servo autonStoneGrab;
     private CRServo autonPlatformServo;
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
@@ -107,7 +108,7 @@ public class secondRedSpot extends LinearOpMode
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
         autonPlatformServo = hardwareMap.crservo.get("servo5");
-
+        autonStoneGrab = hardwareMap.servo.get("servo7");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward

@@ -65,6 +65,7 @@ public class firstBlueSpot extends LinearOpMode
     private DcMotor autonStoneLift;
     private CRServo autonStoneServo;
     private Servo CapStoneServoLock;
+    private Servo autonStoneGrab;
     private CRServo autonPlatformServo;
 
 
@@ -108,6 +109,7 @@ public class firstBlueSpot extends LinearOpMode
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
         autonPlatformServo = hardwareMap.crservo.get("servo5");
+        autonStoneGrab = hardwareMap.servo.get("servo7");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -133,7 +135,7 @@ public class firstBlueSpot extends LinearOpMode
         autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
         autonPlatformServo.setPower(0.0);
-
+        autonStoneGrab.setPosition(0.0);
 
 
         enableEncoders(); //enable the encoders

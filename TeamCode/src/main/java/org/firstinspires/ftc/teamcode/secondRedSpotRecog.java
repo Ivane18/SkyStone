@@ -135,7 +135,7 @@ public class secondRedSpotRecog extends LinearOpMode
         CapStoneServoLock = hardwareMap.servo.get("servo4");
         autonStoneServo = hardwareMap.crservo.get("servo6");
         autonPlatformServo = hardwareMap.crservo.get("servo5");
-        colorSensor = hardwareMap.get(ColorSensor.class, "color");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorLine");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeRed");
 
 
