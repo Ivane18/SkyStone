@@ -144,65 +144,65 @@ public class secondBlueSpotFast extends LinearOpMode {
             //Instructions for the robot
 
             //1st stone
-            move(0, -27, 0, false);
+            move(0, -29, 0, false);
             autonStoneGrab.setPosition(1.0);
             sleep(150);
-            move(0, 8, 0, false);
+            move(0, 9, 0, false);
             move(-35, 0, 0, false);
             autonStoneGrab.setPosition(0.0);
             sleep(150);
 
             //2nd stone
             move(44, 0, 0, false);
-            move(0, -9, 0, false);
+            move(0, -11, 0, false);
             autonStoneGrab.setPosition(1.0);
             sleep(150);
-            move(0, 9, 0, false);
+            move(0, 11, 0, false);
             move(-44, 0, 0, false);
             autonStoneGrab.setPosition(0.0);
             sleep(150);
 
             //3rd stone
             move(53, 0, 0, false);
-            move(0, -9, 0, false);
+            move(0, -13, 0, false);
             autonStoneGrab.setPosition(1.0);
             sleep(150);
-            move(0, 9, 0, false);
+            move(0, 13, 0, false);
             move(-53, 0, 0, false);
             autonStoneGrab.setPosition(0.0);
             sleep(150);
 
             //4th stone
-            move(62, 0, 0, false);
-            move(0, -9, 0, false);
-            autonStoneGrab.setPosition(1.0);
-            sleep(150);
-            move(0, 9, 0, false);
-            move(-62, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
-            sleep(150);
+//            move(62, 0, 0, false);
+//            move(0, -15, 0, false);
+//            autonStoneGrab.setPosition(1.0);
+//            sleep(150);
+//            move(0, 15, 0, false);
+//            move(-62, 0, 0, false);
+//            autonStoneGrab.setPosition(0.0);
+//            sleep(150);
 
             //5th stone
-            move(71, 0, 0, false);
-            move(0, -9, 0, false);
-            autonStoneGrab.setPosition(1.0);
-            sleep(150);
-            move(0, 9, 0, false);
-            move(-71, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
-            sleep(150);
+//            move(71, 0, 0, false);
+//            move(0, -9, 0, false);
+//            autonStoneGrab.setPosition(1.0);
+//            sleep(150);
+//            move(0, 9, 0, false);
+//            move(-71, 0, 0, false);
+//            autonStoneGrab.setPosition(0.0);
+//            sleep(150);
+//
+//            //6th stone
+//            move(80, 0, 0, false);
+//            move(0, -9, 0, false);
+//            autonStoneGrab.setPosition(1.0);
+//            sleep(150);
+//            move(0, 9, 0, false);
+//            move(-80, 0, 0, false);
+//            autonStoneGrab.setPosition(0.0);
+//            sleep(150);
 
-            //6th stone
-            move(80, 0, 0, false);
-            move(0, -9, 0, false);
-            autonStoneGrab.setPosition(1.0);
-            sleep(150);
-            move(0, 9, 0, false);
-            move(-80, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
-            sleep(150);
-
-            move(5, 0, 0, false);
+            move(12, 0, 0, false);
             runOnce = false;
         }
     }

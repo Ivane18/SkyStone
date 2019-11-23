@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -39,12 +40,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.List;
 
-@Autonomous(name = "Second Blue Spot Recog 2", group = "Iterative Opmode")
-public class secondBlueSpotRecog2 extends LinearOpMode {
+
+@Autonomous(name = "First Blue Spot to Line", group = "Iterative Opmode")
+public class firstBlueSpot3 extends LinearOpMode {
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
     private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
     private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
@@ -62,7 +68,7 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
             "Af33ubD/////AAABmZrw69bsukgitaZjU3qd+GgiLcfzvKbbEy92WSwqo1mIjB4OHY/nm5x1tMOf2flMwKepBsnohxy1jNnfUyjkwEvmMchNupexRWSMK7vw7nGT66f1AqGpdHdJZvzvxOAWHlX1DLEOMEyOvbsCcAjvtU2BND5QFLacoYyChBsMoQTt+LI3i+aPkEgZ+YEhFJbTQUQ807WXMWfpBBTI6xTvH1gy7zXI8zLvyje7Uap5vgKD7lWOUx04Xh7AI0Lmvyvw/DfcFs3V8hUgVOTUw3OgqvUS8hSxQv8Cqm74QHQSECuOFQVNwFfJGektlnNlZyKIGCvFwIHle/89bVSkhYh7hwcSgoQtTrtdVRn5n0KNoWPW";
     private static MediaPlayer mediaPlayer = null;
     ColorSensor colorSensor;
-    ColorSensor colorSensor2;
+    ModernRoboticsI2cRangeSensor rangeSensor;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFront = null;
@@ -85,6 +91,23 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+//        /**
+//         * Activate TensorFlow Object Detection before we wait for the start command.
+//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+//         **/
+        if (tfod != null) {
+            tfod.activate();
+        }
 
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -105,7 +128,7 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         autonPlatformServo = hardwareMap.crservo.get("servo5");
         autonStoneGrab = hardwareMap.servo.get("servo7");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorLine");
-        colorSensor2 = hardwareMap.get(ColorSensor.class, "color");
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeBlue");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -133,6 +156,7 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         autonPlatformServo.setPower(0.0);
         autonStoneGrab.setPosition(0.0);
 
+
         enableEncoders(); //enable the encoders
         runtime.reset();
         boolean runOnce = true;
@@ -144,57 +168,58 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive() && runOnce) {
-            //Instructions for the robot
-
-            //1st stone
-            move(0, -27, 0, false);
-            seekSkyStone();
-            autonStoneGrab.setPosition(1.0);
-            sleep(250);
-            move(0, 8, 0, false);
-            moveToBlueLine();
-            move(-10, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
-            sleep(250);
-
-            //2nd stone
-            move(34, 0, 0, false);
-            move(0, -8, 0, false);
-            seekSkyStone();
-            autonStoneGrab.setPosition(1.0);
-            sleep(250);
-            move(0, 9, 0, false);
-            moveToBlueLine();
-            autonStoneGrab.setPosition(0.0);
-            sleep(250);
-
-//            //3rd stone
-//            move(53,0,0, false);
-//            move(0, -9, 0, false);
-//            autonStoneGrab.setPosition(1.0);
-//            sleep(150);
-//            move(0, 9, 0, false);
-//            move(-53,0,0,false);
-//            autonStoneGrab.setPosition(0.0);
-//            sleep(150);
+            move(-30, 0, 0, false);
+            move(0, 16, 0, false);
+            autonPlatformServo.setPower(1.0);
+            sleep(3000);
+            move(30, 0, 0, false);
+//            autonStoneExt.setPower(0.80);
+            autonPlatformServo.setPower(-1.0);
+//            autonStoneServo.setPower(-0.35);
+            sleep(1000);
+//            autonStoneServo.setPower(0.0);
+            autonPlatformServo.setPower(0.0);
+            move(0, -44, 0, false);
+//            autonStoneServo.setPower(-0.35);
+//            autonPlatformServo.setPower(-1.0);
+//            move(-22, 0, 0, false);
+//            autonPlatformServo.setPower(0.0);
+//            autonStoneExt.setPower(0.0);
+//            autonStoneServo.setPower(0.0);
+////            move(0, -27, 0, false);
 //
-//            //4th stone
-//            move(62,0,0, false);
-//            move(0, -9, 0, false);
-//            autonStoneGrab.setPosition(1.0);
-//            sleep(150);
-//            move(0, 9, 0, false);
-//            move(-62,0,0,false);
-//            autonStoneGrab.setPosition(0.0);
-//            sleep(150);
+//            seekSkystone(true);
+//            moveToStone();
+//
+//            autonStoneServo.setPower(1.0);
+//            sleep(2500);
+//            move(13, 0, 0, false); //todo make sure the robot does not hit alliance partner here
+//
+//            moveToBlueLine();
+//            move(0, 9, 0, false); //compensate for change of auton stone
+//            autonStoneServo.setPower(-1.00);
+//            move(0, -10, 0, false);
+//            autonStoneServo.setPower(0.0);
+//
+//
+//            autonStoneLift.setPower(0.5);
+//            autonStoneExt.setPower(-1.00);
+//            sleep(250);
+//            autonStoneLift.setPower(0.0);
+//            sleep(1250);
+//            autonStoneServo.setPower(0.35);
+//            sleep(3000);
+//            autonStoneServo.setPower(0.0);
+//            autonStoneLift.setPower(-0.5);
+//            sleep(250);
+//            autonStoneLift.setPower(0.0);
+////            move(0, 0, -90, true);
+//
 
-
-            move(5, 0, 0, false);
             runOnce = false;
         }
     }
 
-    //forward/backward, side to side, turn
     private void move(float strafeY, float strafeX, float turn, boolean turnSolo) {
         int leftFrontNew;
         int leftBackNew;
@@ -256,7 +281,6 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         rightBack.setPower(DRIVE_SPEED);
     }
 
-
     private void enableEncoders() {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -267,7 +291,6 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
     private void stopMotors() {
@@ -289,17 +312,38 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
-    public void seekSkyStone() {
-        while (colorSensor2.red() > 25 || colorSensor2.red() < 5) {
-            leftFront.setPower(0.35);
+    private void seekSkystone(boolean run) {
+        while (run) {
+            telemetry.addLine("Moving to right");
+            telemetry.update();
+            leftFront.setPower(-0.35);
             rightFront.setPower(0.35);
             leftBack.setPower(0.35);
-            rightBack.setPower(0.35);
+            rightBack.setPower(-0.35);
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-
+                if (updatedRecognitions != null && updatedRecognitions.size() != 0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
+                    telemetry.addLine("I see it");
+                    telemetry.update();
+                    stopMotors();
+                    run = false;
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                recognition.getLeft(), recognition.getTop());
+                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                recognition.getRight(), recognition.getBottom());
+                    }
+                    telemetry.update();
+                }
+            }
         }
         while (leftFront.isBusy()) {
             telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
@@ -312,13 +356,53 @@ public class secondBlueSpotRecog2 extends LinearOpMode {
         stopMotors();
     }
 
-    public void moveToBlueLine() {
+    private void moveToBlueLine() {
         while (colorSensor.blue() < 10) {
-            leftFront.setPower(-0.75);
-            rightFront.setPower(-0.75);
-            leftBack.setPower(-0.75);
-            rightBack.setPower(-0.75);
+            leftFront.setPower(1.00);
+            rightFront.setPower(-1.00);
+            leftBack.setPower(-1.00);
+            rightBack.setPower(1.00);
         }
         stopMotors();
     }
+
+    private void moveToStone() {
+        while (rangeSensor.rawUltrasonic() > 6) {
+            telemetry.addLine("Moving to stone");
+            telemetry.update();
+            leftFront.setPower(-0.55);
+            rightFront.setPower(-0.55);
+            leftBack.setPower(-0.55);
+            rightBack.setPower(-0.55);
+        }
+        stopMotors();
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.6;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
 }

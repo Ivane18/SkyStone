@@ -33,6 +33,7 @@ import android.media.MediaPlayer;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -50,6 +51,7 @@ import java.util.List;
 
 
 @Autonomous(name="First Blue Spot", group="Iterative Opmode")
+@Disabled
 public class firstBlueSpot extends LinearOpMode
 {
     // Declare OpMode members.
@@ -184,25 +186,28 @@ public class firstBlueSpot extends LinearOpMode
             sleep(1000);
             autonStoneServo.setPower(0.0);
             autonPlatformServo.setPower(0.0);
-            move(0, -48, 0, false);
+            move(0, -64, 0, false);
             autonStoneServo.setPower(-0.35);
-            move(-15, 0, 0, false);
+            autonPlatformServo.setPower(-1.0);
+            move(-22, 0, 0, false);
+            autonPlatformServo.setPower(0.0); //this is code not working
             autonStoneExt.setPower(0.0);
             autonStoneServo.setPower(0.0);
+//            move(0, -27, 0, false);
+
             seekSkystone(true);
             moveToStone();
 
             autonStoneServo.setPower(1.0);
             sleep(2500);
-            move(11, 0, 0, false);
+            move(13, 0, 0, false); //todo make sure the robot does not hit alliance partner here
 
             moveToBlueLine();
             move(0, 9, 0, false); //compensate for change of auton stone
             autonStoneServo.setPower(-1.00);
-            move(0, -20, 0, false);
+            move(0, -10, 0, false);
             autonStoneServo.setPower(0.0);
 
-            move(0, 0, -90, true);
 
             autonStoneLift.setPower(0.5);
             autonStoneExt.setPower(-1.00);
@@ -215,6 +220,8 @@ public class firstBlueSpot extends LinearOpMode
             autonStoneLift.setPower(-0.5);
             sleep(250);
             autonStoneLift.setPower(0.0);
+//            move(0, 0, -90, true);
+
 
             runOnce = false;
         }
@@ -312,9 +319,9 @@ public class firstBlueSpot extends LinearOpMode
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void seekSkystone(boolean run) {
+    private void seekSkystone(boolean run) {
         while (run) {
-            telemetry.addLine("Moving to left");
+            telemetry.addLine("Moving to right");
             telemetry.update();
             leftFront.setPower(-0.35);
             rightFront.setPower(0.35);
@@ -366,6 +373,8 @@ public class firstBlueSpot extends LinearOpMode
 
     private void moveToStone() {
         while (rangeSensor.rawUltrasonic() > 6) {
+            telemetry.addLine("Moving to stone");
+            telemetry.update();
             leftFront.setPower(-0.55);
             rightFront.setPower(-0.55);
             leftBack.setPower(-0.55);

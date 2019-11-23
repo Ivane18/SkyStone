@@ -143,10 +143,10 @@ public class driverControl extends LinearOpMode {
                 StoneServoLeft.setPosition(0.0);
             }
             while(gamepad1.y){
-                stoneLift.setPower(0.50);
+                stoneLift.setPower(1.00);
             }
             while(gamepad1.a){
-                stoneLift.setPower(-0.50);
+                stoneLift.setPower(-1.00);
             }
             stoneLift.setPower(0.0);
 

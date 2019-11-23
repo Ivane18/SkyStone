@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import android.media.MediaPlayer;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,6 +49,7 @@ import java.util.List;
 
 
 @Autonomous(name="Second Blue Spot", group="Iterative Opmode")
+@Disabled
 public class secondBlueSpot extends LinearOpMode
 {
     // Declare OpMode members.
