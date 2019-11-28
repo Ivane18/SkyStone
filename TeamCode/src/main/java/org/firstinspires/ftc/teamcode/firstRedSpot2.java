@@ -79,65 +79,36 @@ public class firstRedSpot2 extends LinearOpMode {
     private Servo StoneServoLeft;   // close and open
     private DcMotor stoneLift;
     private DcMotor stoneTilt;
-    private DcMotor autonStoneExt;
-    private DcMotor autonStoneLift;
-    private CRServo autonStoneServo;
+    private DcMotor autonPlatformLock;
     private Servo CapStoneServoLock;
-    private Servo autonStoneGrab;
-    private CRServo autonPlatformServo;
-    private VuforiaLocalizer vuforia;
-
-    private TFObjectDetector tfod;
+    private Servo autonStoneServoRight;
+    private Servo autonStoneServoLeft;
 
     @Override
     public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-        initVuforia();
-
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
-
-//        /**
-//         * Activate TensorFlow Object Detection before we wait for the start command.
-//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-//         **/
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         stoneLift = hardwareMap.get(DcMotor.class, "motor5");
         stoneTilt = hardwareMap.get(DcMotor.class, "motor6");
-        autonStoneExt = hardwareMap.get(DcMotor.class, "motor7");
-        autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
+        autonPlatformLock = hardwareMap.get(DcMotor.class, "motor7");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
-        autonStoneServo = hardwareMap.crservo.get("servo6");
-        autonPlatformServo = hardwareMap.crservo.get("servo5");
-        autonStoneGrab = hardwareMap.servo.get("servo7");
+        autonStoneServoLeft = hardwareMap.servo.get("servo5");
+        autonStoneServoRight = hardwareMap.servo.get("servo6");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorLine");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeRed");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
+
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
-        stoneLift.setDirection(DcMotor.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -145,17 +116,13 @@ public class firstRedSpot2 extends LinearOpMode {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneExt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        autonPlatformLock.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
-        autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
-        autonPlatformServo.setPower(0.0);
-        autonStoneGrab.setPosition(0.0);
-
+        autonStoneServoRight.setPosition(0.0);
+        autonStoneServoLeft.setPosition(1.0);
 
         enableEncoders(); //enable the encoders
         runtime.reset();
@@ -172,43 +139,46 @@ public class firstRedSpot2 extends LinearOpMode {
 
             move(-30, 0, 0, false);
             move(0, -16, 0, false);
-            move(-1, 0, 0, false);
-            autonPlatformServo.setPower(1.0);
-            sleep(2000);
+            move(-2, 0, 0, false);
+            autonPlatformLock.setPower(-1.0);
+            sleep(150);
+            autonPlatformLock.setPower(0.0);
             move(30, 0, 0, false);
-//            autonStoneExt.setPower(0.80);
-            autonPlatformServo.setPower(-1.0);
-//            autonStoneServo.setPower(-0.35);
-            sleep(700);
-//            autonStoneServo.setPower(0.0);
-            autonPlatformServo.setPower(0.0);
+            autonPlatformLock.setPower(1.0);
+            sleep(150);
+            autonPlatformLock.setPower(0.0);
             move(0, 44, 0, false);
 
             move(-18, 0, 0, false);
             move(0, 0, 100, true);
-            move(-33, 0, 0, false);
+
+            move(-32, 0, 0, false);
 //            seekSkystone(true);
             move(0, -10, 0, false);
 //
-            autonStoneGrab.setPosition(1.0);
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
             sleep(200);
-            move(0, 10, 0, false);
+            move(0, 121, 0, false);
             moveToRedLine();
             move(10, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
             sleep(100);
 
             //2nd stone
-            move(-51, 0, 0, false);
+            move(-50, 0, 0, false);
             //seekskystone
-            move(0, -12, 0, true);
+            move(0, -14, 0, true);
 //            move(1,0,0,false);
-            autonStoneGrab.setPosition(1.0);
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
             sleep(200);
-            move(0, 12, 0, false);
+            move(0, 15, 0, false);
             moveToRedLine();
             move(10, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
             sleep(100);
 
 
@@ -312,49 +282,49 @@ public class firstRedSpot2 extends LinearOpMode {
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
-
-    private void seekSkystone(boolean run) {
-        while (run) {
-            telemetry.addLine("Moving to right");
-            telemetry.update();
-            leftFront.setPower(0.35);
-            rightFront.setPower(-0.35);
-            leftBack.setPower(-0.35);
-            rightBack.setPower(0.35);
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-
-                if (updatedRecognitions != null && updatedRecognitions.size() != 0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
-                    telemetry.addLine("I see it");
-                    telemetry.update();
-                    stopMotors();
-                    run = false;
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                    }
-                    telemetry.update();
-                }
-            }
-        }
-        while (leftFront.isBusy()) {
-            telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
-            telemetry.addData("leftBackPosition", leftBack.getCurrentPosition());
-            telemetry.addData("RightFontPosition", rightFront.getCurrentPosition());
-            telemetry.addData("rightBackPosition", rightBack.getCurrentPosition());
-            telemetry.update();
-            Thread.yield();
-        }
-        stopMotors();
-    }
-
+//
+//    private void seekSkystone(boolean run) {
+//        while (run) {
+//            telemetry.addLine("Moving to right");
+//            telemetry.update();
+//            leftFront.setPower(0.35);
+//            rightFront.setPower(-0.35);
+//            leftBack.setPower(-0.35);
+//            rightBack.setPower(0.35);
+//            if (tfod != null) {
+//                // getUpdatedRecognitions() will return null if no new information is available since
+//                // the last time that call was made.
+//                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+//
+//                if (updatedRecognitions != null && updatedRecognitions.size() != 0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
+//                    telemetry.addLine("I see it");
+//                    telemetry.update();
+//                    stopMotors();
+//                    run = false;
+//                    // step through the list of recognitions and display boundary info.
+//                    int i = 0;
+//                    for (Recognition recognition : updatedRecognitions) {
+//                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+//                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+//                                recognition.getLeft(), recognition.getTop());
+//                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+//                                recognition.getRight(), recognition.getBottom());
+//                    }
+//                    telemetry.update();
+//                }
+//            }
+//        }
+//        while (leftFront.isBusy()) {
+//            telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
+//            telemetry.addData("leftBackPosition", leftBack.getCurrentPosition());
+//            telemetry.addData("RightFontPosition", rightFront.getCurrentPosition());
+//            telemetry.addData("rightBackPosition", rightBack.getCurrentPosition());
+//            telemetry.update();
+//            Thread.yield();
+//        }
+//        stopMotors();
+//    }
+//
 
     private void moveToStone() {
         while (rangeSensor.rawUltrasonic() > 7) {
@@ -366,32 +336,32 @@ public class firstRedSpot2 extends LinearOpMode {
         stopMotors();
     }
 
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
-
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
-    }
+//    private void initVuforia() {
+//        /*
+//         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+//         */
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+//
+//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+//        parameters.cameraDirection = CameraDirection.BACK;
+//
+//        //  Instantiate the Vuforia engine
+//        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+//
+//        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+//    }
+//
+//    /**
+//     * Initialize the TensorFlow Object Detection engine.
+//     */
+//    private void initTfod() {
+//        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+//                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+//        tfodParameters.minimumConfidence = 0.6;
+//        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+//    }
 
     private void moveToRedLine() {
         while (colorSensor.red() < 10) {

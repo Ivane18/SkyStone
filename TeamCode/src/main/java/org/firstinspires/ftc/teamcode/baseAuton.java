@@ -278,38 +278,39 @@ public class baseAuton extends LinearOpMode
 //        autonStoneExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        autonStoneLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void seekSkystone(boolean run) {
+
+    private void seekSkystone(boolean run) {
         while (run) {
-            telemetry.addLine("Moving to left");
+            telemetry.addLine("Moving to right");
             telemetry.update();
-            leftFront.setPower(-0.25);
-            rightFront.setPower(0.25);
-            leftBack.setPower(0.25);
-            rightBack.setPower(-0.25);
+            leftFront.setPower(-0.35);
+            rightFront.setPower(0.35);
+            leftBack.setPower(0.35);
+            rightBack.setPower(-0.35);
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-                    if (updatedRecognitions != null && updatedRecognitions.size() !=0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
-                        telemetry.addLine("I see it");
-                        telemetry.update();
-                        stopMotors();
-                        run = false;
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
-                        }
-                        telemetry.update();
+                if (updatedRecognitions != null && updatedRecognitions.size() != 0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
+                    telemetry.addLine("I see it");
+                    telemetry.update();
+                    stopMotors();
+                    run = false;
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                recognition.getLeft(), recognition.getTop());
+                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                recognition.getRight(), recognition.getBottom());
                     }
+                    telemetry.update();
+                }
             }
         }
-        while(leftFront.isBusy()) {
+        while (leftFront.isBusy()) {
             telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
             telemetry.addData("leftBackPosition", leftBack.getCurrentPosition());
             telemetry.addData("RightFontPosition", rightFront.getCurrentPosition());
@@ -319,6 +320,29 @@ public class baseAuton extends LinearOpMode
         }
         stopMotors();
     }
+
+//    private void moveToBlueLine() {
+//        while (colorSensor.blue() < 10) {
+//            leftFront.setPower(1.00);
+//            rightFront.setPower(-1.00);
+//            leftBack.setPower(-1.00);
+//            rightBack.setPower(1.00);
+//        }
+//        stopMotors();
+//    }
+//
+//    private void moveToStone() {
+//        while (rangeSensor.rawUltrasonic() > 6) {
+//            telemetry.addLine("Moving to stone");
+//            telemetry.update();
+//            leftFront.setPower(-0.55);
+//            rightFront.setPower(-0.55);
+//            leftBack.setPower(-0.55);
+//            rightBack.setPower(-0.55);
+//        }
+//        stopMotors();
+//    }
+
     private void initVuforia() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -341,10 +365,9 @@ public class baseAuton extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.5;
+        tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
-
 
 }

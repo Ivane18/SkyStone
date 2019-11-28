@@ -34,9 +34,7 @@ import android.media.MediaPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -54,12 +52,11 @@ public class driverControl extends LinearOpMode {
     private Servo StoneServoLeft;   // close and open
     private DcMotor stoneLift;
     private DcMotor stoneTilt;
-    private DcMotor autonStoneExt;
-    private DcMotor autonStoneLift;
-    private CRServo autonStoneServo;
+    private DcMotor autonPlatformLock;
     private Servo CapStoneServoLock;
-    private Servo autonStoneGrab;
-    private CRServo autonPlatformServo;
+    private Servo autonStoneServoRight;
+    private Servo autonStoneServoLeft;
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -72,14 +69,12 @@ public class driverControl extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         stoneLift = hardwareMap.get(DcMotor.class, "motor5");
         stoneTilt = hardwareMap.get(DcMotor.class, "motor6");
-        autonStoneExt = hardwareMap.get(DcMotor.class, "motor7");
-        autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
+        autonPlatformLock = hardwareMap.get(DcMotor.class, "motor7");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
-        autonStoneServo = hardwareMap.crservo.get("servo6");
-        autonPlatformServo = hardwareMap.crservo.get("servo5");
-        autonStoneGrab = hardwareMap.servo.get("servo7");
+        autonStoneServoLeft = hardwareMap.servo.get("servo5");
+        autonStoneServoRight = hardwareMap.servo.get("servo6");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
@@ -92,15 +87,14 @@ public class driverControl extends LinearOpMode {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneExt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        autonPlatformLock.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
         CapStoneServoLock.setPosition(0.0);
-        autonStoneServo.setPower(0);
-        autonPlatformServo.setPower(0.0);
-        autonStoneGrab.setPosition(0.0);
+        autonStoneServoRight.setPosition(0.0);
+        autonStoneServoLeft.setPosition(1.0);
+
         waitForStart();
         runtime.reset();
 
@@ -110,21 +104,6 @@ public class driverControl extends LinearOpMode {
             double leftBackPower;
             double rightBackPower;
 
-            while(gamepad2.left_trigger > 0) {
-                autonStoneServo.setPower(0.5);
-            }
-            while(gamepad2.right_trigger > 0){
-                autonStoneServo.setPower(-0.5);
-            }
-            autonStoneServo.setPower(0.0);
-
-            while (gamepad1.dpad_left) {
-                autonPlatformServo.setPower(0.5);
-            }
-            while (gamepad1.dpad_right) {
-                autonPlatformServo.setPower(-0.5);
-            }
-            autonPlatformServo.setPower(0.0);
 
             if(gamepad2.a){    //lock
                 CapStoneServoLock.setPosition(0.0);
@@ -142,6 +121,13 @@ public class driverControl extends LinearOpMode {
                 StoneServoRight.setPosition(1.0);
                 StoneServoLeft.setPosition(0.0);
             }
+            while (gamepad1.dpad_left) {    //open
+                autonPlatformLock.setPower(-0.5);
+            }
+            while (gamepad1.dpad_right) { //close
+                autonPlatformLock.setPower(0.5);
+            }
+            autonPlatformLock.setPower(0.0);
             while(gamepad1.y){
                 stoneLift.setPower(1.00);
             }
@@ -158,21 +144,7 @@ public class driverControl extends LinearOpMode {
             }
             stoneTilt.setPower(-0.1);
 
-            while(gamepad2.dpad_left){
-                autonStoneExt.setPower(0.50);
-            }
-            while(gamepad2.dpad_right){
-                autonStoneExt.setPower(-0.50);
-            }
-            autonStoneExt.setPower(0.0);
 
-            while(gamepad2.dpad_up){
-                autonStoneLift.setPower(0.50);
-            }
-            while(gamepad2.dpad_down){
-                autonStoneLift.setPower(-0.50);
-            }
-            autonStoneLift.setPower(0.0);
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
             float strafe_y = 0;

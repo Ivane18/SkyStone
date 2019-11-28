@@ -31,9 +31,11 @@ package org.firstinspires.ftc.teamcode;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -60,6 +62,8 @@ public class secondRedSpotFast extends LinearOpMode {
     private static final String VUFORIA_KEY =
             "Af33ubD/////AAABmZrw69bsukgitaZjU3qd+GgiLcfzvKbbEy92WSwqo1mIjB4OHY/nm5x1tMOf2flMwKepBsnohxy1jNnfUyjkwEvmMchNupexRWSMK7vw7nGT66f1AqGpdHdJZvzvxOAWHlX1DLEOMEyOvbsCcAjvtU2BND5QFLacoYyChBsMoQTt+LI3i+aPkEgZ+YEhFJbTQUQ807WXMWfpBBTI6xTvH1gy7zXI8zLvyje7Uap5vgKD7lWOUx04Xh7AI0Lmvyvw/DfcFs3V8hUgVOTUw3OgqvUS8hSxQv8Cqm74QHQSECuOFQVNwFfJGektlnNlZyKIGCvFwIHle/89bVSkhYh7hwcSgoQtTrtdVRn5n0KNoWPW";
     private static MediaPlayer mediaPlayer = null;
+    ColorSensor colorSensor;
+    ModernRoboticsI2cRangeSensor rangeSensor;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFront = null;
@@ -70,47 +74,36 @@ public class secondRedSpotFast extends LinearOpMode {
     private Servo StoneServoLeft;   // close and open
     private DcMotor stoneLift;
     private DcMotor stoneTilt;
-    private DcMotor autonStoneExt;
-    private DcMotor autonStoneLift;
-    private CRServo autonStoneServo;
+    private DcMotor autonPlatformLock;
     private Servo CapStoneServoLock;
-    private Servo autonStoneGrab;
-    private CRServo autonPlatformServo;
-    private VuforiaLocalizer vuforia;
-
-    private TFObjectDetector tfod;
+    private Servo autonStoneServoRight;
+    private Servo autonStoneServoLeft;
 
     @Override
     public void runOpMode() {
-
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         stoneLift = hardwareMap.get(DcMotor.class, "motor5");
         stoneTilt = hardwareMap.get(DcMotor.class, "motor6");
-        autonStoneExt = hardwareMap.get(DcMotor.class, "motor7");
-        autonStoneLift = hardwareMap.get(DcMotor.class, "motor8");
+        autonPlatformLock = hardwareMap.get(DcMotor.class, "motor7");
         StoneServoLeft = hardwareMap.servo.get("servo1");
         StoneServoRight = hardwareMap.servo.get("servo2");
         CapStoneServoLock = hardwareMap.servo.get("servo4");
-        autonStoneServo = hardwareMap.crservo.get("servo6");
-        autonPlatformServo = hardwareMap.crservo.get("servo5");
-        autonStoneGrab = hardwareMap.servo.get("servo7");
-
+        autonStoneServoLeft = hardwareMap.servo.get("servo5");
+        autonStoneServoRight = hardwareMap.servo.get("servo6");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorLine");
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeRed");
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
+
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
-        stoneLift.setDirection(DcMotor.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -118,16 +111,13 @@ public class secondRedSpotFast extends LinearOpMode {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneExt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        autonStoneLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        autonPlatformLock.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         StoneServoRight.setPosition(0.7);
         StoneServoLeft.setPosition(0.3);
-        autonStoneServo.setPower(0);
         CapStoneServoLock.setPosition(0.0);
-        autonPlatformServo.setPower(0.0);
-        autonStoneGrab.setPosition(0.0);
+        autonStoneServoRight.setPosition(0.0);
+        autonStoneServoLeft.setPosition(1.0);
 
         enableEncoders(); //enable the encoders
         runtime.reset();
@@ -144,31 +134,37 @@ public class secondRedSpotFast extends LinearOpMode {
 
             //1st stone
             move(0, -31, 0, false);
-            autonStoneGrab.setPosition(1.0);
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
             sleep(150);
             move(0, 11, 0, false);
             move(40, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
             sleep(150);
 
             //2nd stone
-            move(-49, 0, 0, false);
+            move(-48, 0, 0, false);
             move(0, -13, 0, false);
-            autonStoneGrab.setPosition(1.0);
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
             sleep(150);
             move(0, 13, 0, false);
             move(49, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
             sleep(150);
 
             //3rd stone
             move(-57, 0, 0, false);
             move(0, -15, 0, false);
-            autonStoneGrab.setPosition(1.0);
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
             sleep(150);
             move(0, 15, 0, false);
             move(57, 0, 0, false);
-            autonStoneGrab.setPosition(0.0);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
             sleep(150);
 
             //4th stone
