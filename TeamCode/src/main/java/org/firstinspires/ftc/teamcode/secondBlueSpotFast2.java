@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
 import android.media.MediaPlayer;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
@@ -36,12 +37,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name = "First Blue Spot", group = "Iterative Opmode")
-public class firstBlueSpot extends LinearOpMode {
+import java.util.Locale;
+
+
+@Autonomous(name = "Second Blue Spot Fast2", group = "Iterative Opmode")
+public class secondBlueSpotFast2 extends LinearOpMode {
     private static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: Andymark Motor Encoder
     private static final double COUNTS_PER_MOTOR_REV_60 = 1680;    // eg: Andymark Motor Encoder
     private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
@@ -51,7 +57,7 @@ public class firstBlueSpot extends LinearOpMode {
             (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double COUNTS_PER_INCH_60 = (COUNTS_PER_MOTOR_REV_60 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES_Lift * 3.1415);
-    private static final double DRIVE_SPEED = 0.75;
+    private static final double DRIVE_SPEED = 0.85;
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
@@ -74,6 +80,9 @@ public class firstBlueSpot extends LinearOpMode {
     private Servo CapStoneServoLock;
     private Servo autonStoneServoRight;
     private Servo autonStoneServoLeft;
+    ColorSensor colorSensorRev;
+    DistanceSensor sensorDistance;
+
 
     @Override
     public void runOpMode() {
@@ -91,6 +100,22 @@ public class firstBlueSpot extends LinearOpMode {
         autonStoneServoRight = hardwareMap.servo.get("servo6");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorLine");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeBlue");
+
+        // get a reference to the color sensor.
+        colorSensorRev = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+
+        // get a reference to the distance sensor that shares the same name.
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+
+        float[] hsvValues = {0F, 0F, 0F};
+
+        // values is a reference to the hsvValues array.
+        final float[] values = hsvValues;
+
+        // sometimes it helps to multiply the raw RGB values with a scale factor
+        // to amplify/attentuate the measured values.
+        final double SCALE_FACTOR = 255;
+
 
         //initialize components
         // Most robots need the motor on one side to be reversed to drive forward
@@ -126,64 +151,114 @@ public class firstBlueSpot extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive() && runOnce) {
-            move(-30, 0, 0, false);
-            move(0, 16, 0, false);
-            autonPlatformLock.setPower(-1.0);
-            sleep(675);
-            autonPlatformLock.setPower(0.0);
-            move(30, 0, 0, false);
-            autonPlatformLock.setPower(1.0);
-            sleep(275);
-            autonPlatformLock.setPower(0.0);
-            move(0, -70, 0, false);
+            boolean run = true;
+            while (run) {
+                Color.RGBToHSV((int) (colorSensorRev.red() * SCALE_FACTOR),
+                        (int) (colorSensorRev.green() * SCALE_FACTOR),
+                        (int) (colorSensorRev.blue() * SCALE_FACTOR),
+                        hsvValues);
+                telemetry.addData("Distance (cm)",
+                        String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
+                telemetry.addData("Alpha", colorSensorRev.alpha());
+                telemetry.addData("Red  ", colorSensorRev.red());
+                telemetry.addData("Green", colorSensorRev.green());
+                telemetry.addData("Blue ", colorSensorRev.blue());
+                telemetry.addData("Hue", hsvValues[0]);
+                telemetry.update();
 
-            move(-26, 0, 0, false); // was 23
-//            move(0, 0, 103, true);
-//            move(29, 0, 0, false);
-            //add range sensor
-//            move(0, -6, 0, false);
-            //grab
+                while (sensorDistance.getDistance(DistanceUnit.CM) > 30) {
+                    leftFront.setPower(-0.15);
+                    rightFront.setPower(0.15);
+                    leftBack.setPower(0.15);
+                    rightBack.setPower(-0.15);
+                }
+                while (hsvValues[0] < 70) {
+                    leftFront.setPower(0.15);
+                    rightFront.setPower(0.15);
+                    leftBack.setPower(0.15);
+                    rightBack.setPower(0.15);
+                }
+                stopMotors();
+                run = false;
+            }
+            //Instructions for the robot
+//
+//            //1st stone
+//            move(0, -29, 0, false);
 //            autonStoneServoRight.setPosition(1.0);
 //            autonStoneServoLeft.setPosition(0.0);
-//            sleep(200);
+//            sleep(150);
 //            move(0, 9, 0, false);
-            autonPlatformLock.setPower(-1.0);
-            sleep(400);
-            autonPlatformLock.setPower(0.0);
-            move(-2, 0, 0, false);
-            move(14, 0, 0, false);
-            move(0, 40, 0, false);
-            autonPlatformLock.setPower(1.0);
-            sleep(675);
-            autonPlatformLock.setPower(0.0);
-            move(0, -10, 0, false);
-//            moveToBlueLine();
-//            move(-14, 0, 0, false);
-//            //release
+//            move(-35, 0, 0, false);
 //            autonStoneServoRight.setPosition(0.0);
 //            autonStoneServoLeft.setPosition(1.0);
-//            sleep(100);
+//            sleep(150);
 //
 //            //2nd stone
-//            move(46, 0, 0, false); //change
-//            //range sensor
-//            move(0, -10, 0, true);
+//            move(43, 0, 0, false);
+////            move(0, -11, 0, false);
+//            moveToStone();
 //            autonStoneServoRight.setPosition(1.0);
 //            autonStoneServoLeft.setPosition(0.0);
-//            sleep(200);
+//            sleep(150);
 //            move(0, 11, 0, false);
-//            moveToBlueLine();
-//            move(-13, 0, 0, false);
+//            move(-44, 0, 0, false);
 //            autonStoneServoRight.setPosition(0.0);
 //            autonStoneServoLeft.setPosition(1.0);
-//            sleep(100);
+//            sleep(150);
 //
+//            //3rd stone
+//            move(53, 0, 0, false);
+////            move(0, -13, 0, false);
+//            moveToStone();
+//            autonStoneServoRight.setPosition(1.0);
+//            autonStoneServoLeft.setPosition(0.0);
+//            sleep(150);
+//            move(0, 13, 0, false);
+//            move(-53, 0, 0, false);
+//            autonStoneServoRight.setPosition(0.0);
+//            autonStoneServoLeft.setPosition(1.0);
+//            sleep(150);
 //
-//            move(5, 0, 0, false);
+//            //4th stone
+//            move(62, 0, 0, false);
+////            move(0, -15, 0, false);
+//            moveToStone();
+//            autonStoneServoRight.setPosition(1.0);
+//            autonStoneServoLeft.setPosition(0.0);
+//            sleep(150);
+//            move(0, 15, 0, false);
+//            move(-62, 0, 0, false);
+//            autonStoneServoRight.setPosition(0.0);
+//            autonStoneServoLeft.setPosition(1.0);
+//            sleep(150);
+//
+//            //5th stone
+////            move(71, 0, 0, false);
+////            move(0, -9, 0, false);
+////            autonStoneGrab.setPosition(1.0);
+//            sleep(150);
+//            move(0, 9, 0, false);
+//            move(-71, 0, 0, false);
+//            autonStoneGrab.setPosition(0.0);
+//            sleep(150);
+//
+//            //6th stone
+//            move(80, 0, 0, false);
+//            move(0, -9, 0, false);
+//            autonStoneGrab.setPosition(1.0);
+//            sleep(150);
+//            move(0, 9, 0, false);
+//            move(-80, 0, 0, false);
+//            autonStoneGrab.setPosition(0.0);
+//            sleep(150);
+
+            move(12, 0, 0, false);
             runOnce = false;
         }
     }
 
+    //forward/backward, side to side, turn
     private void move(float strafeY, float strafeX, float turn, boolean turnSolo) {
         int leftFrontNew;
         int leftBackNew;
@@ -245,6 +320,7 @@ public class firstBlueSpot extends LinearOpMode {
         rightBack.setPower(DRIVE_SPEED);
     }
 
+
     private void enableEncoders() {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -255,6 +331,7 @@ public class firstBlueSpot extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     private void stopMotors() {
@@ -276,82 +353,48 @@ public class firstBlueSpot extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
-    private void moveToBlueLine() {
-        while (colorSensor.blue() < 10) {
+    private void moveToStone() {
+        while (rangeSensor.rawUltrasonic() > 4) {
+            telemetry.addLine("Moving to stone");
+            telemetry.update();
             leftFront.setPower(-0.75);
-            rightFront.setPower(-0.75);
-            leftBack.setPower(-0.75);
+            rightFront.setPower(0.75);
+            leftBack.setPower(0.75);
             rightBack.setPower(-0.75);
         }
         stopMotors();
     }
-
-//    public void seekSkystone(boolean run) {
-//        while (run) {
-//            telemetry.addLine("Moving to forward");
-//            telemetry.update();
-//            leftFront.setPower(0.35);
-//            rightFront.setPower(0.35);
-//            leftBack.setPower(0.35);
-//            rightBack.setPower(0.35);
-//            if (tfod != null) {
-//                // getUpdatedRecognitions() will return null if no new information is available since
-//                // the last time that call was made.
-//                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+//    private void findStone() {
+//        Color.RGBToHSV((int) (colorSensorRev.red() * SCALE_FACTOR),
+//                (int) (colorSensorRev.green() * SCALE_FACTOR),
+//                (int) (colorSensorRev.blue() * SCALE_FACTOR),
+//                hsvValues);
+//        telemetry.addData("Distance (cm)",
+//                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
+//        telemetry.addData("Alpha", colorSensorRev.alpha());
+//        telemetry.addData("Red  ", colorSensorRev.red());
+//        telemetry.addData("Green", colorSensorRev.green());
+//        telemetry.addData("Blue ", colorSensorRev.blue());
+//        telemetry.addData("Hue", hsvValues[0]);
+//        telemetry.update();
 //
-//                if (updatedRecognitions != null && updatedRecognitions.size() != 0 && updatedRecognitions.get(0).getLabel() == "Skystone") {
-//                    telemetry.addLine("I see it");
-//                    telemetry.update();
-//                    stopMotors();
-//                    run = false;
-//                    // step through the list of recognitions and display boundary info.
-//                    int i = 0;
-//                    for (Recognition recognition : updatedRecognitions) {
-//                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-//                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-//                                recognition.getLeft(), recognition.getTop());
-//                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-//                                recognition.getRight(), recognition.getBottom());
-//                    }
-//                    telemetry.update();
-//                }
-//            }
+//        while(sensorDistance.getDistance(DistanceUnit.CM) > 30){
+//            leftFront.setPower(-0.15);
+//            rightFront.setPower(0.15);
+//            leftBack.setPower(0.15);
+//            rightBack.setPower(-0.15);
 //        }
-//        while (leftFront.isBusy()) {
-//            telemetry.addData("LeftFontPosition", leftFront.getCurrentPosition());
-//            telemetry.addData("leftBackPosition", leftBack.getCurrentPosition());
-//            telemetry.addData("RightFontPosition", rightFront.getCurrentPosition());
-//            telemetry.addData("rightBackPosition", rightBack.getCurrentPosition());
-//            telemetry.update();
-//            Thread.yield();
+//        while( hsvValues[0] < 70 ) {
+//            leftFront.setPower(0.15);
+//            rightFront.setPower(0.15);
+//            leftBack.setPower(0.15);
+//            rightBack.setPower(0.15);
 //        }
 //        stopMotors();
 //    }
 
-//    private void initVuforia() {
-//        /*
-//         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-//         */
-//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-//
-//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-//        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam");
-//
-//        //  Instantiate the Vuforia engine
-//        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-//
-//        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-//    }
-//
-//    private void initTfod() {
-//        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-//                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-//        tfodParameters.minimumConfidence = 0.6;
-//        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
-//    }
-
+//    private void stayCloseToStone
 }

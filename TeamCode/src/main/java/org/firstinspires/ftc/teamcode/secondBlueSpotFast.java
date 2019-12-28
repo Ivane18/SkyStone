@@ -55,7 +55,7 @@ public class secondBlueSpotFast extends LinearOpMode {
             (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double COUNTS_PER_INCH_60 = (COUNTS_PER_MOTOR_REV_60 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES_Lift * 3.1415);
-    private static final double DRIVE_SPEED = 0.75;
+    private static final double DRIVE_SPEED = 0.85;
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
@@ -130,62 +130,70 @@ public class secondBlueSpotFast extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive() && runOnce) {
+
             //Instructions for the robot
 
             //1st stone
-            move(0, -29, 0, false);
+            move(0, -30, 0, false);
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
-            sleep(150);
-            move(0, 9, 0, false);
+            sleep(250);
+            move(0, 10, 0, false);
             move(-35, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
-            sleep(150);
+            sleep(250);
 
             //2nd stone
-            move(43, 0, 0, false);
+            move(44, 0, 0, false);
             move(0, -11, 0, false);
+//            moveToStone();
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
-            sleep(150);
+            sleep(250);
             move(0, 11, 0, false);
             move(-44, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
-            sleep(150);
+            sleep(250);
 
             //3rd stone
-            move(53, 0, 0, false);
+            move(54, 0, 0, false);
             move(0, -13, 0, false);
+//            moveToStone();
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
-            sleep(150);
+            sleep(250);
             move(0, 13, 0, false);
-            move(-53, 0, 0, false);
+            move(-54, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
-            sleep(150);
+            sleep(250);
 
             //4th stone
-//            move(62, 0, 0, false);
-//            move(0, -15, 0, false);
-//            autonStoneServoRight.setPosition(1.0);
-//            autonStoneServoLeft.setPosition(0.0);
-//            sleep(150);
-//            move(0, 15, 0, false);
-//            move(-62, 0, 0, false);
-//            autonStoneGrab.setPosition(0.0);
-//            sleep(150);
+            move(62, 0, 0, false);
+            move(0, -15, 0, false);
+//            moveToStone();
+            autonStoneServoRight.setPosition(1.0);
+            autonStoneServoLeft.setPosition(0.0);
+            sleep(250);
+            move(0, 15, 0, false);
+            move(-62, 0, 0, false);
+            autonStoneServoRight.setPosition(0.0);
+            autonStoneServoLeft.setPosition(1.0);
+            sleep(250);
 
             //5th stone
 //            move(71, 0, 0, false);
-//            move(0, -9, 0, false);
-//            autonStoneGrab.setPosition(1.0);
+////            move(0, -9, 0, false);
+//            moveToStone();
+//            autonStoneServoRight.setPosition(1.0);
+//            autonStoneServoLeft.setPosition(0.0);
 //            sleep(150);
-//            move(0, 9, 0, false);
+//            move(0, 17, 0, false);
 //            move(-71, 0, 0, false);
-//            autonStoneGrab.setPosition(0.0);
+//            autonStoneServoRight.setPosition(0.0);
+//            autonStoneServoLeft.setPosition(1.0);
 //            sleep(150);
 //
 //            //6th stone
@@ -299,5 +307,17 @@ public class secondBlueSpotFast extends LinearOpMode {
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+    }
+
+    private void moveToStone() {
+        while (rangeSensor.rawUltrasonic() > 4) {
+            telemetry.addLine("Moving to stone");
+            telemetry.update();
+            leftFront.setPower(-0.75);
+            rightFront.setPower(0.75);
+            leftBack.setPower(0.75);
+            rightBack.setPower(-0.75);
+        }
+        stopMotors();
     }
 }

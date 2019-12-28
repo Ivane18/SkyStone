@@ -86,7 +86,6 @@ public class baseAuton extends LinearOpMode
 
     private VuforiaLocalizer vuforia;
 
-    private TFObjectDetector tfod;
     @Override
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
@@ -167,6 +166,8 @@ public class baseAuton extends LinearOpMode
             runOnce = false;
         }
     }
+
+    private TFObjectDetector tfod;
 
     //forward/backward, side to side, turn
     private void move(float strafeY,float strafeX, float turn){

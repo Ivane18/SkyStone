@@ -149,7 +149,7 @@ public class firstBlueSpot2 extends LinearOpMode {
 
             move(-21, 0, 0, false); // was 23
             move(0, 0, 103, true);
-            move(29, 0, 0, false);
+            move(27, 0, 0, false);
             //add range sensor
             move(0, -6, 0, false);
             //grab
@@ -158,7 +158,7 @@ public class firstBlueSpot2 extends LinearOpMode {
             sleep(200);
             move(0, 9, 0, false);
             moveToBlueLine();
-            move(-14, 0, 0, false);
+            move(-13, 0, 0, false);
             //release
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);

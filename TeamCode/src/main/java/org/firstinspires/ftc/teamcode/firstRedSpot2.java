@@ -139,27 +139,27 @@ public class firstRedSpot2 extends LinearOpMode {
 
             move(-30, 0, 0, false);
             move(0, -16, 0, false);
-            move(-2, 0, 0, false);
+//            move(-1, 0, 0, false);
             autonPlatformLock.setPower(-1.0);
-            sleep(150);
+            sleep(675);
             autonPlatformLock.setPower(0.0);
             move(30, 0, 0, false);
             autonPlatformLock.setPower(1.0);
-            sleep(150);
+            sleep(675);
             autonPlatformLock.setPower(0.0);
             move(0, 44, 0, false);
 
             move(-18, 0, 0, false);
             move(0, 0, 100, true);
 
-            move(-32, 0, 0, false);
+            move(-30, 0, 0, false);
 //            seekSkystone(true);
-            move(0, -10, 0, false);
+            move(0, -11, 0, false);
 //
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
             sleep(200);
-            move(0, 121, 0, false);
+            move(0, 12, 0, false);
             moveToRedLine();
             move(10, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
@@ -167,9 +167,9 @@ public class firstRedSpot2 extends LinearOpMode {
             sleep(100);
 
             //2nd stone
-            move(-50, 0, 0, false);
+            move(-51, 0, 0, false);
             //seekskystone
-            move(0, -14, 0, true);
+            move(0, -15, 0, true);
 //            move(1,0,0,false);
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);

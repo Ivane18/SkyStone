@@ -137,7 +137,7 @@ public class secondRedSpotFast extends LinearOpMode {
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
             sleep(150);
-            move(0, 11, 0, false);
+            move(0, 12, 0, false);
             move(40, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
@@ -145,11 +145,11 @@ public class secondRedSpotFast extends LinearOpMode {
 
             //2nd stone
             move(-48, 0, 0, false);
-            move(0, -13, 0, false);
+            move(0, -14, 0, false);
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
             sleep(150);
-            move(0, 13, 0, false);
+            move(0, 15, 0, false);
             move(49, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
@@ -157,11 +157,11 @@ public class secondRedSpotFast extends LinearOpMode {
 
             //3rd stone
             move(-57, 0, 0, false);
-            move(0, -15, 0, false);
+            move(0, -16, 0, false);
             autonStoneServoRight.setPosition(1.0);
             autonStoneServoLeft.setPosition(0.0);
             sleep(150);
-            move(0, 15, 0, false);
+            move(0, 16, 0, false);
             move(57, 0, 0, false);
             autonStoneServoRight.setPosition(0.0);
             autonStoneServoLeft.setPosition(1.0);
